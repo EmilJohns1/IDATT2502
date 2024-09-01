@@ -26,10 +26,10 @@ model = LinearRegressionModel()
 # We change the value of 'lr' and the 'epoch' to try to optimize the model
 optimizer = torch.optim.SGD([model.W, model.b], lr=0.1)
 
-# For every 1000 steps the learning rate is multiplied by 0.9
+# For every 10000 steps the learning rate is multiplied by 0.95
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10000, gamma=0.95)
 
-for epoch in range(100000):
+for epoch in range(500000):
     loss = model.loss(x_train, y_train)
     loss.backward()
 
@@ -41,7 +41,7 @@ for epoch in range(100000):
     # Call on the scheduler to decrease the learning rate
     scheduler.step()
 
-    if epoch % 100 == 0:  # Print every 100 epochs
+    if epoch % 10000 == 0:  # Print every 10000 epochs
         print(f'Epoch {epoch}: Loss = {loss.item()}')
 
 # Print final model parameters and loss
