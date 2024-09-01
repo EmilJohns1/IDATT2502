@@ -17,7 +17,7 @@ Using the following weights:
     self.W2 = torch.tensor([[5.0], [5.0]], requires_grad=True)  # Weights for output layer
     self.b2 = torch.tensor([1.5]
 
-![XOR Model Visualization](https://gyazo.com/91d28955c3c3929f49c4c58d14dc24a9)
+[![XOR Model Visualization](https://i.gyazo.com/91d28955c3c3929f49c4c58d14dc24a9.png)](https://gyazo.com/91d28955c3c3929f49c4c58d14dc24a9)
 
 ## Description
 
@@ -36,8 +36,8 @@ We can see that the model is correct for [0, 0], [0, 1] and [1, 0], however [1, 
     self.b1 = torch.tensor([[-3.40935969, -8.69532299]], requires_grad=True)  # Biases for hidden layer
     self.W2 = torch.tensor([[13.01280117], [-13.79168701]], requires_grad=True)  # Weights for output layer
     self.b2 = torch.tensor([[-6.1043458]], requires_grad=True)  # Bias for output layer'
-
-![XOR Model Visualization](https://gyazo.com/b89df8c78fe8539c37f9798ce9b4d7ee)
+  
+[![XOR Model Visualization](https://i.gyazo.com/b89df8c78fe8539c37f9798ce9b4d7ee.png)](https://gyazo.com/b89df8c78fe8539c37f9798ce9b4d7ee)
 
 ## Description
 
