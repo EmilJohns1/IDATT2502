@@ -14,10 +14,10 @@ def sigmoid(t):
 class XORModel:
     def __init__(self):
         # Initialize weights and biases with random values
-        self.W1 = torch.tensor([[7.43929911, 5.68582106], [7.44233704, 5.68641663]], requires_grad=True)  # Weights for hidden layer
-        self.b1 = torch.tensor([[-3.40935969, -8.69532299]], requires_grad=True)  # Biases for hidden layer
-        self.W2 = torch.tensor([[13.01280117], [-13.79168701]], requires_grad=True)  # Weights for output layer
-        self.b2 = torch.tensor([[-6.1043458]], requires_grad=True)  # Bias for output layer
+        self.W1 = torch.tensor([[7.43929911, 5.68582106], [7.44233704, 5.68641663]], requires_grad=True)
+        self.b1 = torch.tensor([[-3.40935969, -8.69532299]], requires_grad=True)
+        self.W2 = torch.tensor([[13.01280117], [-13.79168701]], requires_grad=True)
+        self.b2 = torch.tensor([[-6.1043458]], requires_grad=True)
 
     def forward(self, x):
         h = sigmoid(x @ self.W1 + self.b1)  # First layer
