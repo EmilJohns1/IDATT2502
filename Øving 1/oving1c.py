@@ -27,7 +27,7 @@ model = NonLinearRegressionModel()
 optimizer = torch.optim.Adam([model.W, model.b], lr=0.001)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1000, gamma=0.95)
 
-for epoch in range(50000):
+for epoch in range(10000):
     loss = model.loss(x_train, y_train)
     loss.backward()
     optimizer.step()

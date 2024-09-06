@@ -1,97 +1,94 @@
 import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
-import torchvision
-from torch import nn, optim
 import numpy as np
 
-# Load observations from the MNIST dataset
-mnist_train = torchvision.datasets.MNIST('./data', train=True, download=True,
-                                         transform=torchvision.transforms.ToTensor())
-mnist_test = torchvision.datasets.MNIST('./data', train=False, download=True,
-                                        transform=torchvision.transforms.ToTensor())
+# 1. Load the MNIST dataset
+batch_size = 64
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
 
-x_train = mnist_train.data.view(-1, 784).float()
-y_train = torch.nn.functional.one_hot(mnist_train.targets, num_classes=10).float()
-x_test = mnist_test.data.view(-1, 784).float()
-y_test = torch.nn.functional.one_hot(mnist_test.targets, num_classes=10).float()
+train_dataset = datasets.MNIST(root='./data', train=True, transform=transform, download=True)
+test_dataset = datasets.MNIST(root='./data', train=False, transform=transform, download=True)
+
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
 
-# Define the neural network class for digit classification
-class NumberModel(nn.Module):
+# 2. Define the model using softmax
+class SimpleSoftmaxModel(nn.Module):
     def __init__(self):
-        super(NumberModel, self).__init__()
-        # Initialize weights and biases
-        self.fc1 = nn.Linear(784, 128)  # Input layer: 784 features (28x28) to 128 hidden units
-        self.fc2 = nn.Linear(128, 10)  # Output layer: 128 hidden units to 10 classes (digits 0-9)
+        super(SimpleSoftmaxModel, self).__init__()
+        self.linear = nn.Linear(784, 128)  # 28x28 input features, 10 output classes
+        self.linear2 = nn.Linear(128, 10)
 
     def forward(self, x):
-        x = self.fc1(x)
-        x = self.fc2(x)  # Linear transformation to output
-        return torch.softmax(x, dim=1)  # Log softmax to get class probabilities
+        x = x.view(-1, 784)  # Flatten the input
+        x = self.linear(x)
 
-    def loss(self, outputs, labels):
-        return nn.CrossEntropyLoss()(outputs, labels)
+        return torch.softmax(x, dim=1)  # Apply softmax
 
 
-# Instantiate the model
-model = NumberModel()
+model = SimpleSoftmaxModel()
 
-# Define the optimizer
-optimizer = optim.SGD(model.parameters(), lr=0.01)
+# 3. Training setup
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(model.parameters(), lr=0.1)
 
 # Training loop
-for epoch in range(10):  # Number of epochs
+epochs = 10
+for epoch in range(epochs):
     model.train()
     running_loss = 0.0
-    for i in range(0, len(x_train), 64):  # Mini-batch gradient descent
-        images = x_train[i:i + 64]
-        labels = y_train[i:i + 64]
+    for images, labels in train_loader:
         optimizer.zero_grad()
         outputs = model(images)
-        loss = model.loss(outputs, labels)
+        loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
+    print(f"Epoch {epoch + 1}, Loss: {running_loss / len(train_loader)}")
 
-    print(f'Epoch {epoch + 1}, Loss: {running_loss / (len(x_train) // 64)}')
-
-# Evaluate the model
+# 4. Evaluate the model
 model.eval()
 correct = 0
 total = 0
 with torch.no_grad():
-    for i in range(0, len(x_test), 1000):
-        images = x_test[i:i + 1000]
-        labels = y_test[i:i + 1000]
+    for images, labels in test_loader:
         outputs = model(images)
         _, predicted = torch.max(outputs, 1)
         total += labels.size(0)
-        correct += (predicted == torch.argmax(labels, 1)).sum().item()
+        correct += (predicted == labels).sum().item()
 
-print(f'Accuracy: {100 * correct / total}%')
+accuracy = correct / total
+print(f"Test Accuracy: {accuracy:.4f}")
 
-
-# Visualize some predictions
-def visualize_predictions(model, num_images=5):
-    model.eval()
-    images, labels = next(iter(torch.utils.data.DataLoader(mnist_test, batch_size=5)))
-    outputs = model(images.view(-1, 784))
-    _, predicted = torch.max(outputs, 1)
-
-    fig, axes = plt.subplots(1, num_images, figsize=(12, 4))
-    for i in range(num_images):
-        ax = axes[i]
-        ax.imshow(images[i].squeeze(), cmap='gray')
-        ax.set_title(f'Label: {labels[i].item()}, Pred: {predicted[i].item()}')
-        ax.axis('off')
+# 5. Visualize and save the weight matrices
+weights = model.linear.weight.data.numpy()
+for i in range(10):  # There are 10 classes
+    weight_image = weights[i].reshape(28, 28)
+    plt.imshow(weight_image, cmap='viridis')
+    plt.title(f'Weights for Class {i}')
+    plt.colorbar()
     plt.show()
 
+# 6. Visualize 10 random test images with their predicted labels
+# Select 10 random images from the test set
+images, labels = next(iter(test_loader))
+images, labels = images[:10], labels[:10]
 
-visualize_predictions(model)
+# Get model predictions
+model.eval()
+with torch.no_grad():
+    outputs = model(images)
+    _, predicted = torch.max(outputs, 1)
 
-# Print final weights and biases
-print("Final weights and biases after training:")
-print("fc1 weights:", model.fc1.weight.detach().numpy())
-print("fc1 biases:", model.fc1.bias.detach().numpy())
-print("fc2 weights:", model.fc2.weight.detach().numpy())
-print("fc2 biases:", model.fc2.bias.detach().numpy())
+# Plot the images and their predicted labels
+fig, axes = plt.subplots(1, 10, figsize=(15, 1.5))
+for idx in range(10):
+    axes[idx].imshow(images[idx].squeeze(), cmap='gray')
+    axes[idx].set_title(f'Pred: {predicted[idx].item()}')
+    axes[idx].axis('off')
+
+plt.show()
