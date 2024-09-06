@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
-import numpy as np
+import random
 
 # 1. Load the MNIST dataset
 batch_size = 64
@@ -20,12 +20,14 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, s
 class SimpleSoftmaxModel(nn.Module):
     def __init__(self):
         super(SimpleSoftmaxModel, self).__init__()
-        self.linear = nn.Linear(784, 128)  # 28x28 input features, 10 output classes
-        self.linear2 = nn.Linear(128, 10)
+        self.linear = nn.Linear(784, 128)  # 28x28 input neurons, 128 output neurons
+        self.linear2 = nn.Linear(128, 10)  # 128 input neurons translated to our 10 output classes which represent our numbers
 
     def forward(self, x):
-        x = x.view(-1, 784)  # Flatten the input
+        x = x.view(-1, 784)
         x = self.linear(x)
+        x = torch.relu(x)
+        x = self.linear2(x)
 
         return torch.softmax(x, dim=1)  # Apply softmax
 
@@ -64,30 +66,28 @@ with torch.no_grad():
 accuracy = correct / total
 print(f"Test Accuracy: {accuracy:.4f}")
 
-# 5. Visualize and save the weight matrices
-weights = model.linear.weight.data.numpy()
-for i in range(10):  # There are 10 classes
-    weight_image = weights[i].reshape(28, 28)
-    plt.imshow(weight_image, cmap='viridis')
-    plt.title(f'Weights for Class {i}')
-    plt.colorbar()
-    plt.show()
 
-# 6. Visualize 10 random test images with their predicted labels
-# Select 10 random images from the test set
-images, labels = next(iter(test_loader))
-images, labels = images[:10], labels[:10]
+# 5. Visualize 10 random test images with their predicted labels
+# Select a batch of images from the test set
+images, labels = next(iter(test_loader))  # Get a batch of images and labels
+
+# Select 10 random indices from this batch
+indices = random.sample(range(len(images)), 10)  # Randomly sample 10 indices
+
+# Get the images and labels corresponding to the random indices
+random_images = images[indices]
+random_labels = labels[indices]
 
 # Get model predictions
 model.eval()
 with torch.no_grad():
-    outputs = model(images)
+    outputs = model(random_images)
     _, predicted = torch.max(outputs, 1)
 
 # Plot the images and their predicted labels
 fig, axes = plt.subplots(1, 10, figsize=(15, 1.5))
 for idx in range(10):
-    axes[idx].imshow(images[idx].squeeze(), cmap='gray')
+    axes[idx].imshow(random_images[idx].squeeze(), cmap='gray')
     axes[idx].set_title(f'Pred: {predicted[idx].item()}')
     axes[idx].axis('off')
 
