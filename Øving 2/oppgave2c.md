@@ -38,7 +38,6 @@ We can see that the model is correct for [0, 0], [0, 1] and [1, 0], however [1, 
     self.b2 = torch.tensor([[-6.1043458]], requires_grad=True)  # Bias for output layer'
 
 [![Final XOR Model Visualization](https://i.gyazo.com/b89df8c78fe8539c37f9798ce9b4d7ee.png)](https://gyazo.com/b89df8c78fe8539c37f9798ce9b4d7ee)
->>>>>>> fb94a76eede31fc5a9736c7125e94d1f739c8bc1
 
 ## Description
 
