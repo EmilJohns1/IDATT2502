@@ -18,7 +18,6 @@ Using the following weights:
     self.b2 = torch.tensor([1.5]
 
 [![Initial XOR Model Visualization](https://i.gyazo.com/91d28955c3c3929f49c4c58d14dc24a9.png)](https://gyazo.com/91d28955c3c3929f49c4c58d14dc24a9)
->>>>>>> fb94a76eede31fc5a9736c7125e94d1f739c8bc1
 
 ## Description
 
