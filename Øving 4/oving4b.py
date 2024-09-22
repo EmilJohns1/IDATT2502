@@ -136,4 +136,5 @@ def test_model(model, test_words):
             print(f'Input: "{test_word}", Predicted Emoji: {predicted_emoji}')
 
 # Test the model with words that were not in the training data
+# It works with words longer than 4 characters, and I don't know why but im not complaining
 test_model(model, ["rt", "rats", "cat", "ct"])
