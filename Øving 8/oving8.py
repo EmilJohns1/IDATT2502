@@ -83,7 +83,7 @@ def main():
     alpha = 0.1
     gamma = 0.99
 
-    random_map = generate_random_map(size=6)
+    random_map = generate_random_map(size=8)
     print("Generated Solvable FrozenLake Map:")
     for row in random_map:
         print(' '.join(row))
